@@ -1,0 +1,179 @@
+
+
+
+
+Results summary
+
+Num checkpoints                Peak Memory   Time to train 1 step
+------------------------------------------------------------------
+
+No gradient checkpointing        3.3 GB        38 s
+0 checkpoints                    465 MB        139 s
+2 checkpoints                    578 MB        97 s
+4 checkpoints                    759 MB        76 s
+8 checkpoints                    1.3 GB        69 s
+16 checkpoints                   2.1 GB        66 s
+
+
+
+
+No gradient checkpointing
+Time elapsed is  38.11444139480591  seconds
+Filename: gradient_checkpoint_profile.py
+
+Line #    Mem usage    Increment   Line Contents
+================================================
+    52  297.809 MiB  297.809 MiB   @profile
+    53                             def train():
+    54  297.809 MiB    0.000 MiB       img_dim = 256
+    55  297.809 MiB    0.000 MiB       n_channels = 1
+    56  297.809 MiB    0.000 MiB       bs = 16
+    57  309.727 MiB   11.918 MiB       x = tf.ones([bs,img_dim,img_dim,n_channels])
+    58  309.727 MiB    0.000 MiB       y = tf.ones([bs], dtype=tf.int64)
+    59  356.789 MiB   47.062 MiB       model = get_cnn_model(img_dim, n_channels)
+    60  356.789 MiB    0.000 MiB       optimizer = optimizers.SGD()
+    61  389.398 MiB    0.000 MiB       for _ in range(1):
+    62  356.789 MiB    0.000 MiB           with tf.GradientTape() as tape: 
+    63                                         #logits = model_fn(model, x, _watch_vars=model.trainable_variables)
+    64 3266.609 MiB 2909.820 MiB               logits = model_fn(model, x)
+    65 3266.609 MiB    0.000 MiB               loss  = compute_loss(logits, y)
+    66 3266.609 MiB    0.000 MiB               print('loss', loss) 
+    67  428.801 MiB    0.000 MiB           grads = tape.gradient(loss, model.trainable_variables)
+    68  428.801 MiB    0.000 MiB           optimizer.apply_gradients(zip(grads, model.trainable_variables))
+    69  389.398 MiB    0.000 MiB           del grads 
+    70  389.398 MiB    0.000 MiB       return
+
+
+num_checkpoints = 0
+Time elapsed is  138.60916304588318  seconds
+Filename: gradient_checkpoint_profile.py
+
+Line #    Mem usage    Increment   Line Contents
+================================================
+    54  270.355 MiB  270.355 MiB   @profile
+    55                             def train():
+    56  270.355 MiB    0.000 MiB       img_dim = 256
+    57  270.355 MiB    0.000 MiB       n_channels = 1
+    58  270.355 MiB    0.000 MiB       bs = 16
+    59  281.656 MiB   11.301 MiB       x = tf.ones([bs,img_dim,img_dim,n_channels])
+    60  281.656 MiB    0.000 MiB       y = tf.ones([bs], dtype=tf.int64)
+    61  329.043 MiB   47.387 MiB       model = get_cnn_model(img_dim, n_channels)
+    62  329.043 MiB    0.000 MiB       optimizer = optimizers.SGD()
+    63  426.262 MiB    0.000 MiB       for _ in range(1):
+    64  329.043 MiB    0.000 MiB           with tf.GradientTape() as tape: 
+    65  338.715 MiB    9.672 MiB               logits = model_fn(model, x, num_checkpoints= 0, _watch_vars=model.trainable_variables)
+    66                                         #logits = model_fn(model, x)
+    67  338.715 MiB    0.000 MiB               loss  = compute_loss(logits, y)
+    68  338.715 MiB    0.000 MiB               print('loss', loss) 
+    69  465.766 MiB  127.051 MiB           grads = tape.gradient(loss, model.trainable_variables)
+    70  465.766 MiB    0.000 MiB           optimizer.apply_gradients(zip(grads, model.trainable_variables))
+    71  426.262 MiB    0.000 MiB           del grads 
+    72  426.262 MiB    0.000 MiB       return
+
+num_checkpoints = 2
+Time elapsed is  96.6496217250824  seconds
+Filename: gradient_checkpoint_profile.py
+
+Line #    Mem usage    Increment   Line Contents
+================================================
+    54  270.348 MiB  270.348 MiB   @profile
+    55                             def train():
+    56  270.348 MiB    0.000 MiB       img_dim = 256
+    57  270.348 MiB    0.000 MiB       n_channels = 1
+    58  270.348 MiB    0.000 MiB       bs = 16
+    59  281.660 MiB   11.312 MiB       x = tf.ones([bs,img_dim,img_dim,n_channels])
+    60  281.660 MiB    0.000 MiB       y = tf.ones([bs], dtype=tf.int64)
+    61  329.062 MiB   47.402 MiB       model = get_cnn_model(img_dim, n_channels)
+    62  329.062 MiB    0.000 MiB       optimizer = optimizers.SGD()
+    63  502.633 MiB    0.000 MiB       for _ in range(1):
+    64  329.062 MiB    0.000 MiB           with tf.GradientTape() as tape: 
+    65  578.750 MiB  249.688 MiB               logits = model_fn(model, x, num_checkpoints= 2, _watch_vars=model.trainable_variables)
+    66                                         #logits = model_fn(model, x)
+    67  578.750 MiB    0.000 MiB               loss  = compute_loss(logits, y)
+    68  578.750 MiB    0.000 MiB               print('loss', loss) 
+    69  542.145 MiB    0.000 MiB           grads = tape.gradient(loss, model.trainable_variables)
+    70  542.145 MiB    0.000 MiB           optimizer.apply_gradients(zip(grads, model.trainable_variables))
+    71  502.633 MiB    0.000 MiB           del grads 
+    72  502.633 MiB    0.000 MiB       return
+
+num_checkpoints = 4
+Time elapsed is  75.77069306373596  seconds
+Filename: gradient_checkpoint_profile.py
+
+Line #    Mem usage    Increment   Line Contents
+================================================
+    54  270.414 MiB  270.414 MiB   @profile
+    55                             def train():
+    56  270.414 MiB    0.000 MiB       img_dim = 256
+    57  270.414 MiB    0.000 MiB       n_channels = 1
+    58  270.414 MiB    0.000 MiB       bs = 16
+    59  281.793 MiB   11.379 MiB       x = tf.ones([bs,img_dim,img_dim,n_channels])
+    60  281.793 MiB    0.000 MiB       y = tf.ones([bs], dtype=tf.int64)
+    61  329.445 MiB   47.652 MiB       model = get_cnn_model(img_dim, n_channels)
+    62  329.445 MiB    0.000 MiB       optimizer = optimizers.SGD()
+    63  344.105 MiB    0.000 MiB       for _ in range(1):
+    64  329.445 MiB    0.000 MiB           with tf.GradientTape() as tape: 
+    65  758.777 MiB  429.332 MiB               logits = model_fn(model, x, num_checkpoints= 4, _watch_vars=model.trainable_variables)
+    66                                         #logits = model_fn(model, x)
+    67  758.777 MiB    0.000 MiB               loss  = compute_loss(logits, y)
+    68  758.777 MiB    0.000 MiB               print('loss', loss) 
+    69  383.516 MiB    0.000 MiB           grads = tape.gradient(loss, model.trainable_variables)
+    70  383.516 MiB    0.000 MiB           optimizer.apply_gradients(zip(grads, model.trainable_variables))
+    71  344.105 MiB    0.000 MiB           del grads 
+    72  344.105 MiB    0.000 MiB       return
+
+num_checkpoints = 8
+Time elapsed is  69.10822820663452  seconds
+Filename: gradient_checkpoint_profile.py
+
+Line #    Mem usage    Increment   Line Contents
+================================================
+    54  270.742 MiB  270.742 MiB   @profile
+    55                             def train():
+    56  270.742 MiB    0.000 MiB       img_dim = 256
+    57  270.742 MiB    0.000 MiB       n_channels = 1
+    58  270.742 MiB    0.000 MiB       bs = 16
+    59  282.055 MiB   11.312 MiB       x = tf.ones([bs,img_dim,img_dim,n_channels])
+    60  282.055 MiB    0.000 MiB       y = tf.ones([bs], dtype=tf.int64)
+    61  330.125 MiB   48.070 MiB       model = get_cnn_model(img_dim, n_channels)
+    62  330.125 MiB    0.000 MiB       optimizer = optimizers.SGD()
+    63  348.652 MiB    0.000 MiB       for _ in range(1):
+    64  330.125 MiB    0.000 MiB           with tf.GradientTape() as tape: 
+    65 1279.621 MiB  949.496 MiB               logits = model_fn(model, x, num_checkpoints= 8, _watch_vars=model.trainable_variables)
+    66                                         #logits = model_fn(model, x)
+    67 1279.621 MiB    0.000 MiB               loss  = compute_loss(logits, y)
+    68 1279.621 MiB    0.000 MiB               print('loss', loss) 
+    69  388.086 MiB    0.000 MiB           grads = tape.gradient(loss, model.trainable_variables)
+    70  388.086 MiB    0.000 MiB           optimizer.apply_gradients(zip(grads, model.trainable_variables))
+    71  348.652 MiB    0.000 MiB           del grads 
+    72  348.652 MiB    0.000 MiB       return
+
+num_checkpoints = 16
+Time elapsed is  66.41089081764221  seconds
+Filename: gradient_checkpoint_profile.py
+
+Line #    Mem usage    Increment   Line Contents
+================================================
+    54  271.273 MiB  271.273 MiB   @profile
+    55                             def train():
+    56  271.273 MiB    0.000 MiB       img_dim = 256
+    57  271.273 MiB    0.000 MiB       n_channels = 1
+    58  271.273 MiB    0.000 MiB       bs = 16
+    59  282.336 MiB   11.062 MiB       x = tf.ones([bs,img_dim,img_dim,n_channels])
+    60  282.336 MiB    0.000 MiB       y = tf.ones([bs], dtype=tf.int64)
+    61  330.500 MiB   48.164 MiB       model = get_cnn_model(img_dim, n_channels)
+    62  330.500 MiB    0.000 MiB       optimizer = optimizers.SGD()
+    63  349.188 MiB    0.000 MiB       for _ in range(1):
+    64  330.500 MiB    0.000 MiB           with tf.GradientTape() as tape: 
+    65 2080.141 MiB 1749.641 MiB               logits = model_fn(model, x, num_checkpoints= 16, _watch_vars=model.trainable_variables)
+    66                                         #logits = model_fn(model, x)
+    67 2080.141 MiB    0.000 MiB               loss  = compute_loss(logits, y)
+    68 2080.141 MiB    0.000 MiB               print('loss', loss) 
+    69  388.691 MiB    0.000 MiB           grads = tape.gradient(loss, model.trainable_variables)
+    70  388.691 MiB    0.000 MiB           optimizer.apply_gradients(zip(grads, model.trainable_variables))
+    71  349.188 MiB    0.000 MiB           del grads 
+    72  349.188 MiB    0.000 MiB       return
+
+
+
+

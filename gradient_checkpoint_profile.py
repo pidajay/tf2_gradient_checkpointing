@@ -62,7 +62,7 @@ def train():
     optimizer = optimizers.SGD()
     for _ in range(1):
         with tf.GradientTape() as tape: 
-            logits = model_fn(model, x, _watch_vars=model.trainable_variables)
+            logits = model_fn(model, x, num_checkpoints= 16, _watch_vars=model.trainable_variables)
             #logits = model_fn(model, x)
             loss  = compute_loss(logits, y)
             print('loss', loss) 
@@ -83,7 +83,7 @@ def train_popular():
     optimizer = optimizers.SGD()
     for _ in range(1):
         with tf.GradientTape() as tape: 
-            logits = model_fn(model, x, _watch_vars=model.trainable_variables)
+            logits = model_fn(model, x, num_checkpoints=0, _watch_vars=model.trainable_variables)
             #logits = model_fn(model, x)
             loss  = compute_loss(logits, y)
             print('loss', loss) 

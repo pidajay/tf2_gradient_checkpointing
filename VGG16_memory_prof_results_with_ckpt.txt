@@ -1,0 +1,179 @@
+
+
+Results summary
+
+Num checkpoints                Peak Memory   Time to train 1 step
+------------------------------------------------------------------
+
+No gradient checkpointing        4.7 GB        41 s
+0 checkpoints                    1.5 GB        264 s
+2 checkpoints                    1.6 GB        165 s
+4 checkpoints                    2.0 GB        145 s
+8 checkpoints                    2.4 GB        137 s
+16 checkpoints                   4.2 GB        130 s
+
+
+
+No gradient checkpointing
+Time elapsed is  40.5058159828186  seconds
+Filename: gradient_checkpoint_profile.py
+
+Line #    Mem usage    Increment   Line Contents
+================================================
+    75  268.477 MiB  268.477 MiB   @profile
+    76                             def train_popular():
+    77  268.477 MiB    0.000 MiB       img_dim = 224 
+    78  268.477 MiB    0.000 MiB       n_channels = 3
+    79  268.477 MiB    0.000 MiB       bs = 64 
+    80  312.809 MiB   44.332 MiB       x = tf.ones([bs,img_dim,img_dim,n_channels])
+    81  312.809 MiB    0.000 MiB       y = tf.ones([bs], dtype=tf.int64)
+    82  950.277 MiB  637.469 MiB       model = tf.keras.applications.vgg16.VGG16() #mobilenet.MobileNet() #vgg19.VGG19()
+    83  950.277 MiB    0.000 MiB       optimizer = optimizers.SGD()
+    84 1114.004 MiB    0.000 MiB       for _ in range(1):
+    85  950.277 MiB    0.000 MiB           with tf.GradientTape() as tape: 
+    86                                         #logits = model_fn(model, x, num_checkpoints=16, _watch_vars=model.trainable_variables)
+    87 4681.727 MiB 3731.449 MiB               logits = model_fn(model, x)
+    88 4681.727 MiB    0.000 MiB               loss  = compute_loss(logits, y)
+    89 4681.727 MiB    0.000 MiB               print('loss', loss) 
+    90 1569.625 MiB    0.000 MiB           grads = tape.gradient(loss, model.trainable_variables)
+    91 1569.996 MiB    0.371 MiB           optimizer.apply_gradients(zip(grads, model.trainable_variables))
+    92 1114.004 MiB    0.000 MiB           del grads 
+    93 1114.004 MiB    0.000 MiB       return
+
+
+num_checkpoints = 0
+Time elapsed is  263.9617805480957  seconds
+Filename: gradient_checkpoint_profile.py
+
+Line #    Mem usage    Increment   Line Contents
+================================================
+    75  270.516 MiB  270.516 MiB   @profile
+    76                             def train_popular():
+    77  270.516 MiB    0.000 MiB       img_dim = 224 
+    78  270.516 MiB    0.000 MiB       n_channels = 3
+    79  270.516 MiB    0.000 MiB       bs = 64 
+    80  314.273 MiB   43.758 MiB       x = tf.ones([bs,img_dim,img_dim,n_channels])
+    81  314.273 MiB    0.000 MiB       y = tf.ones([bs], dtype=tf.int64)
+    82  966.062 MiB  651.789 MiB       model = tf.keras.applications.vgg16.VGG16() #mobilenet.MobileNet() #vgg19.VGG19()
+    83  966.062 MiB    0.000 MiB       optimizer = optimizers.SGD()
+    84 1049.105 MiB    0.000 MiB       for _ in range(1):
+    85  966.062 MiB    0.000 MiB           with tf.GradientTape() as tape: 
+    86  973.750 MiB    7.688 MiB               logits = model_fn(model, x, num_checkpoints=0, _watch_vars=model.trainable_variables)
+    87                                         #logits = model_fn(model, x)
+    88  973.750 MiB    0.000 MiB               loss  = compute_loss(logits, y)
+    89  973.750 MiB    0.000 MiB               print('loss', loss) 
+    90 1504.641 MiB  530.891 MiB           grads = tape.gradient(loss, model.trainable_variables)
+    91 1505.039 MiB    0.398 MiB           optimizer.apply_gradients(zip(grads, model.trainable_variables))
+    92 1049.105 MiB    0.000 MiB           del grads 
+    93 1049.105 MiB    0.000 MiB       return
+
+
+num_checkpoints=2
+Time elapsed is  165.45447444915771  seconds
+Filename: gradient_checkpoint_profile.py
+
+Line #    Mem usage    Increment   Line Contents
+================================================
+    75  269.973 MiB  269.973 MiB   @profile
+    76                             def train_popular():
+    77  269.973 MiB    0.000 MiB       img_dim = 224 
+    78  269.973 MiB    0.000 MiB       n_channels = 3
+    79  269.973 MiB    0.000 MiB       bs = 64 
+    80  313.953 MiB   43.980 MiB       x = tf.ones([bs,img_dim,img_dim,n_channels])
+    81  313.953 MiB    0.000 MiB       y = tf.ones([bs], dtype=tf.int64)
+    82  950.461 MiB  636.508 MiB       model = tf.keras.applications.vgg16.VGG16() #mobilenet.MobileNet() #vgg19.VGG19()
+    83  950.461 MiB    0.000 MiB       optimizer = optimizers.SGD()
+    84 1124.777 MiB    0.000 MiB       for _ in range(1):
+    85  950.461 MiB    0.000 MiB           with tf.GradientTape() as tape: 
+    86 1422.938 MiB  472.477 MiB               logits = model_fn(model, x, num_checkpoints=2, _watch_vars=model.trainable_variables)
+    87                                         #logits = model_fn(model, x)
+    88 1422.938 MiB    0.000 MiB               loss  = compute_loss(logits, y)
+    89 1422.938 MiB    0.000 MiB               print('loss', loss) 
+    90 1580.277 MiB  157.340 MiB           grads = tape.gradient(loss, model.trainable_variables)
+    91 1580.785 MiB    0.508 MiB           optimizer.apply_gradients(zip(grads, model.trainable_variables))
+    92 1124.777 MiB    0.000 MiB           del grads 
+    93 1124.777 MiB    0.000 MiB       return
+
+
+num_checkpoints=4
+Time elapsed is  144.93340063095093  seconds
+Filename: gradient_checkpoint_profile.py
+
+Line #    Mem usage    Increment   Line Contents
+================================================
+    75  270.395 MiB  270.395 MiB   @profile
+    76                             def train_popular():
+    77  270.395 MiB    0.000 MiB       img_dim = 224 
+    78  270.395 MiB    0.000 MiB       n_channels = 3
+    79  270.395 MiB    0.000 MiB       bs = 64 
+    80  314.344 MiB   43.949 MiB       x = tf.ones([bs,img_dim,img_dim,n_channels])
+    81  314.344 MiB    0.000 MiB       y = tf.ones([bs], dtype=tf.int64)
+    82  943.746 MiB  629.402 MiB       model = tf.keras.applications.vgg16.VGG16() #mobilenet.MobileNet() #vgg19.VGG19()
+    83  943.746 MiB    0.000 MiB       optimizer = optimizers.SGD()
+    84 1091.355 MiB    0.000 MiB       for _ in range(1):
+    85  943.746 MiB    0.000 MiB           with tf.GradientTape() as tape: 
+    86 2028.988 MiB 1085.242 MiB               logits = model_fn(model, x, num_checkpoints=4, _watch_vars=model.trainable_variables)
+    87                                         #logits = model_fn(model, x)
+    88 2028.988 MiB    0.000 MiB               loss  = compute_loss(logits, y)
+    89 2028.988 MiB    0.000 MiB               print('loss', loss) 
+    90 1610.844 MiB    0.000 MiB           grads = tape.gradient(loss, model.trainable_variables)
+    91 1547.363 MiB    0.000 MiB           optimizer.apply_gradients(zip(grads, model.trainable_variables))
+    92 1091.355 MiB    0.000 MiB           del grads 
+    93 1091.355 MiB    0.000 MiB       return
+
+
+
+num_checkpoints = 8
+Time elapsed is  137.31446433067322  seconds
+Filename: gradient_checkpoint_profile.py
+
+Line #    Mem usage    Increment   Line Contents
+================================================
+    75  269.988 MiB  269.988 MiB   @profile
+    76                             def train_popular():
+    77  269.988 MiB    0.000 MiB       img_dim = 224 
+    78  269.988 MiB    0.000 MiB       n_channels = 3
+    79  269.988 MiB    0.000 MiB       bs = 64 
+    80  314.148 MiB   44.160 MiB       x = tf.ones([bs,img_dim,img_dim,n_channels])
+    81  314.148 MiB    0.000 MiB       y = tf.ones([bs], dtype=tf.int64)
+    82  951.723 MiB  637.574 MiB       model = tf.keras.applications.vgg16.VGG16() #mobilenet.MobileNet() #vgg19.VGG19()
+    83  951.723 MiB    0.000 MiB       optimizer = optimizers.SGD()
+    84 1107.980 MiB    0.000 MiB       for _ in range(1):
+    85  951.723 MiB    0.000 MiB           with tf.GradientTape() as tape: 
+    86 2379.824 MiB 1428.102 MiB               logits = model_fn(model, x, num_checkpoints=8, _watch_vars=model.trainable_variables)
+    87                                         #logits = model_fn(model, x)
+    88 2379.824 MiB    0.000 MiB               loss  = compute_loss(logits, y)
+    89 2379.824 MiB    0.000 MiB               print('loss', loss) 
+    90 1563.633 MiB    0.000 MiB           grads = tape.gradient(loss, model.trainable_variables)
+    91 1563.914 MiB    0.281 MiB           optimizer.apply_gradients(zip(grads, model.trainable_variables))
+    92 1107.980 MiB    0.000 MiB           del grads 
+    93 1107.980 MiB    0.000 MiB       return
+
+
+num_checkpoints = 16
+Time elapsed is  130.31701946258545  seconds
+Filename: gradient_checkpoint_profile.py
+
+Line #    Mem usage    Increment   Line Contents
+================================================
+    75  269.949 MiB  269.949 MiB   @profile
+    76                             def train_popular():
+    77  269.949 MiB    0.000 MiB       img_dim = 224 
+    78  269.949 MiB    0.000 MiB       n_channels = 3
+    79  269.949 MiB    0.000 MiB       bs = 64 
+    80  314.414 MiB   44.465 MiB       x = tf.ones([bs,img_dim,img_dim,n_channels])
+    81  314.414 MiB    0.000 MiB       y = tf.ones([bs], dtype=tf.int64)
+    82  961.641 MiB  647.227 MiB       model = tf.keras.applications.vgg16.VGG16() #mobilenet.MobileNet() #vgg19.VGG19()
+    83  961.641 MiB    0.000 MiB       optimizer = optimizers.SGD()
+    84 1136.707 MiB    0.000 MiB       for _ in range(1):
+    85  961.641 MiB    0.000 MiB           with tf.GradientTape() as tape: 
+    86 4203.973 MiB 3242.332 MiB               logits = model_fn(model, x, num_checkpoints=16, _watch_vars=model.trainable_variables)
+    87                                         #logits = model_fn(model, x)
+    88 4203.973 MiB    0.000 MiB               loss  = compute_loss(logits, y)
+    89 4203.973 MiB    0.000 MiB               print('loss', loss) 
+    90 1592.367 MiB    0.000 MiB           grads = tape.gradient(loss, model.trainable_variables)
+    91 1592.641 MiB    0.273 MiB           optimizer.apply_gradients(zip(grads, model.trainable_variables))
+    92 1136.707 MiB    0.000 MiB           del grads 
+    93 1136.707 MiB    0.000 MiB       return
+
+

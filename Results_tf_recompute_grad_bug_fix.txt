@@ -1,0 +1,116 @@
+
+No recompute
+--------------
+Peak memory 3.3 GB. Time to train 38 seconds
+
+With recompute before bug fix
+------------------------------
+Peak memory 3.3 GB. Time to train 46 seconds
+
+With recompute after bug fix
+-----------------------------
+Peak memory 704 MB. Time to train 46 seconds
+
+
+
+Training with no recompute. 
+----------------------------
+
+
+loss tf.Tensor(2.3072045, shape=(), dtype=float32)
+Time elapsed is  38.25018072128296  seconds
+Filename: run_recompute_grad_with_profile.py
+
+Line #    Mem usage    Increment   Line Contents
+================================================
+    92  292.117 MiB  292.117 MiB   @profile
+    93                             def train_no_recompute():
+    94  292.117 MiB    0.000 MiB       img_dim = 256
+    95  292.117 MiB    0.000 MiB       n_channels = 1
+    96  292.117 MiB    0.000 MiB       bs = 16
+    97  303.566 MiB   11.449 MiB       x = tf.ones([bs,img_dim,img_dim,n_channels])
+    98  305.039 MiB    1.473 MiB       y = tf.ones([bs], dtype=tf.int64)
+    99  351.855 MiB   46.816 MiB       model = get_cnn_model(img_dim, n_channels)
+   100  351.855 MiB    0.000 MiB       optimizer = optimizers.SGD()
+   101  351.855 MiB    0.000 MiB       tr_vars = model.trainable_variables
+   102  384.445 MiB    0.000 MiB       for _ in range(1):
+   103  351.855 MiB    0.000 MiB           with tf.GradientTape() as tape:
+   104 3261.836 MiB 2909.980 MiB               logits = model(x)
+   105 3261.836 MiB    0.000 MiB               loss  = compute_loss(logits, y)
+   106 3261.836 MiB    0.000 MiB               print('loss', loss)
+   107  423.934 MiB    0.000 MiB           grads = tape.gradient(loss, tr_vars) # tr_vars
+   108  423.934 MiB    0.000 MiB           optimizer.apply_gradients(zip(grads, tr_vars))
+   109  384.445 MiB    0.000 MiB           del grads 
+   110  384.445 MiB    0.000 MiB       return
+
+
+Training with recompute before recompute_grad bug fix
+-------------------------------------------------------
+
+loss tf.Tensor(2.3031003, shape=(), dtype=float32)
+Time elapsed is  46.08573627471924  seconds
+Filename: run_with_profile_split.py
+
+Line #    Mem usage    Increment   Line Contents
+================================================
+   169  294.949 MiB  294.949 MiB   @profile
+   170                             def train_tf_recompute():
+   171  294.949 MiB    0.000 MiB       img_dim = 256
+   172  294.949 MiB    0.000 MiB       n_channels = 1
+   173  294.949 MiB    0.000 MiB       bs = 16
+   174  306.953 MiB   12.004 MiB       x = tf.ones([bs,img_dim,img_dim,n_channels])
+   175  306.953 MiB    0.000 MiB       y = tf.ones([bs], dtype=tf.int64)
+   176  312.371 MiB    5.418 MiB       bk1_orig = model_block1(img_dim, n_channels)
+   177  312.371 MiB    0.000 MiB       bk1 = tf.recompute_grad(bk1_orig)
+   178  313.660 MiB    1.289 MiB       bk2_orig =  model_block2()
+   179  313.660 MiB    0.000 MiB       bk2 = tf.recompute_grad(bk2_orig)
+   180  354.918 MiB   41.258 MiB       bk3_orig = model_block3()
+   181  354.918 MiB    0.000 MiB       bk3 = tf.recompute_grad(bk3_orig)
+   182  354.918 MiB    0.000 MiB       optimizer = optimizers.SGD()
+   183  354.918 MiB    0.000 MiB       tr_vars = bk1_orig.trainable_variables + bk2_orig.trainable_variables + bk3_orig.trainable_variables
+   184  668.566 MiB    0.000 MiB       for _ in range(1):
+   185  354.918 MiB    0.000 MiB           with tf.GradientTape() as tape:
+   186  605.141 MiB  250.223 MiB               logits1 = bk1(x)#, variables = tr_vars)
+   187 2045.398 MiB 1440.258 MiB               logits2 = bk2(logits1)#, variables = tr_vars)
+   188 3265.211 MiB 1219.812 MiB               logits3 = bk3(logits2)#, variables = tr_vars)
+   189 3265.211 MiB    0.000 MiB               loss  = compute_loss(logits3, y)
+   190 3265.211 MiB    0.000 MiB               print('loss', loss)
+   191  708.035 MiB    0.000 MiB           grads = tape.gradient(loss, tr_vars) # tr_vars
+   192  708.035 MiB    0.000 MiB           optimizer.apply_gradients(zip(grads, tr_vars))
+   193  668.566 MiB    0.000 MiB           del grads 
+
+
+Training with recompute after recompute_grad bug fix
+-------------------------------------------------------
+
+loss tf.Tensor(2.3029354, shape=(), dtype=float32)
+Time elapsed is  46.03147649765015  seconds
+Filename: run_recompute_grad_with_profile.py
+
+Line #    Mem usage    Increment   Line Contents
+================================================
+   112  291.492 MiB  291.492 MiB   @profile
+   113                             def train_tf_recompute():
+   114  291.492 MiB    0.000 MiB       img_dim = 256
+   115  291.492 MiB    0.000 MiB       n_channels = 1
+   116  291.492 MiB    0.000 MiB       bs = 16
+   117  303.941 MiB   12.449 MiB       x = tf.ones([bs,img_dim,img_dim,n_channels])
+   118  305.348 MiB    1.406 MiB       y = tf.ones([bs], dtype=tf.int64)
+   119  308.953 MiB    3.605 MiB       bk1_orig = model_block1(img_dim, n_channels)
+   120  308.953 MiB    0.000 MiB       bk1 = tf.recompute_grad(bk1_orig)
+   121  310.406 MiB    1.453 MiB       bk2_orig =  model_block2()
+   122  310.406 MiB    0.000 MiB       bk2 = tf.recompute_grad(bk2_orig)
+   123  351.316 MiB   40.910 MiB       bk3_orig = model_block3()
+   124  351.316 MiB    0.000 MiB       bk3 = tf.recompute_grad(bk3_orig)
+   125  351.316 MiB    0.000 MiB       optimizer = optimizers.SGD()
+   126  351.316 MiB    0.000 MiB       tr_vars = bk1_orig.trainable_variables + bk2_orig.trainable_variables + bk3_orig.trainable_variables
+   127  664.074 MiB    0.000 MiB       for _ in range(1):
+   128  351.316 MiB    0.000 MiB           with tf.GradientTape() as tape:
+   129  441.215 MiB   89.898 MiB               logits1 = bk1(x, trainable_variables=bk1_orig.trainable_variables)
+   130  601.504 MiB  160.289 MiB               logits2 = bk2(logits1, trainable_variables=bk2_orig.trainable_variables)
+   131  602.180 MiB    0.676 MiB               logits3 = bk3(logits2, trainable_variables=bk3_orig.trainable_variables)
+   132  602.180 MiB    0.000 MiB               loss  = compute_loss(logits3, y)
+   133  602.180 MiB    0.000 MiB               print('loss', loss)
+   134  703.508 MiB  101.328 MiB           grads = tape.gradient(loss, tr_vars) # tr_vars
+   135  703.508 MiB    0.000 MiB           optimizer.apply_gradients(zip(grads, tr_vars))
+   136  664.074 MiB    0.000 MiB           del grads 
